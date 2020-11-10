@@ -106,13 +106,16 @@ b = 0.5  # laser distance to the left of center
 
 car = Car(L, H, a, b)
 
-sigmas = np.array([1, 1, 0.5])*1e-3 # TODO
+sigmas = np.array([4, 4, 0.6])*1e-2 # TODO
+#sigmas = np.array([1, 1, 0.5])*1e-3 # TODO
+#sigmas = np.array([0.4, 0.4, 0.02]) # TODO
 CorrCoeff = np.array([[1, 0, 0], [0, 1, 0.9], [0, 0.9, 1]])
 Q = np.diag(sigmas) @ CorrCoeff @ np.diag(sigmas)
 
-R = np.diag(np.array([0.08, 0.008])**2) # TODO
+#R = np.diag(np.array([0.8, 0.05])**2) # TODO [0.8, 0.05]
+R = np.diag(np.array([0.05, 0.02])**2)
 
-JCBBalphas = np.array([1e-5, 1e-8])
+JCBBalphas = np.array([1e-5, 1e-10])
 sensorOffset = np.array([car.a + car.L, car.b])
 doAsso = True
 
@@ -227,7 +230,7 @@ for k in tqdm(range(N)):
 # NIS
 insideCI = (CInorm[:mk, 0] <= NISnorm[:mk]) * (NISnorm[:mk] <= CInorm[:mk, 1])
 
-fig3, ax3 = plt.subplots(num=3, clear=True)
+fig3, ax3 = plt.subplots(num=3, clear=True, constrained_layout = True)
 ax3.plot(CInorm[:mk, 0], "--")
 ax3.plot(CInorm[:mk, 1], "--")
 ax3.plot(NISnorm[:mk], lw=0.5)
@@ -238,7 +241,7 @@ ax3.set_title(f"NIS, {insideCI.mean()*100:.2f}% inside CI, ANIS = {(NISnorm[:mk]
 # %% slam
 
 if do_raw_prediction:
-    fig5, ax5 = plt.subplots(num=5, clear=True)
+    fig5, ax5 = plt.subplots(num=5, clear=True, constrained_layout = True)
     ax5.scatter(
         Lo_m[timeGps < timeOdo[N - 1]],
         La_m[timeGps < timeOdo[N - 1]],
@@ -252,7 +255,7 @@ if do_raw_prediction:
     ax5.legend()
 
 # %%
-fig6, ax6 = plt.subplots(num=6, clear=True)
+fig6, ax6 = plt.subplots(num=6, clear=True, constrained_layout = True)
 ax6.scatter(*eta[3:].reshape(-1, 2).T, color="r", marker="x")
 ax6.plot(*xupd[mk_first:mk, :2].T)
 ax6.set(

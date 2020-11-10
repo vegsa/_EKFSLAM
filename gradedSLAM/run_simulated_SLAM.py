@@ -97,7 +97,7 @@ M = len(landmarks)
 
 # %% Initilize
 Q = np.diag(np.array([1, 1, 0.15])*1e-3) # np.eye(3)  TODO
-R = np.diag(np.array([0.06, 0.02])**2) #np.eye(2) TODO
+R = np.diag(np.array([0.07, 0.017])**2) #np.eye(2) TODO
 
 # np.diag(np.array([0.4, 0.4, 0.02])**2), np.diag(np.array([0.4, 0.01])**2)
 
@@ -202,7 +202,7 @@ offsets = ranges * 0.2
 mins -= offsets
 maxs += offsets
 
-fig2, ax2 = plt.subplots(num=2, clear=True)
+fig2, ax2 = plt.subplots(num=2, clear=True, constrained_layout = True)
 # landmarks
 ax2.scatter(*landmarks.T, c="r", marker="^")
 ax2.scatter(*lmk_est_final.T, c="b", marker=".")
@@ -225,7 +225,7 @@ ax2.grid()
 # NIS
 insideCI = (CInorm[:N,0] <= NISnorm[:N]) * (NISnorm[:N] <= CInorm[:N,1])
 
-fig3, ax3 = plt.subplots(num=3, clear=True)
+fig3, ax3 = plt.subplots(num=3, clear=True, constrained_layout = True)
 ax3.plot(CInorm[:N,0], '--')
 ax3.plot(CInorm[:N,1], '--')
 ax3.plot(NISnorm[:N], lw=0.5)
@@ -234,7 +234,7 @@ ax3.set_title(f'NIS, {insideCI.mean()*100}% inside CI')
 
 # NEES
 
-fig4, ax4 = plt.subplots(nrows=3, ncols=1, figsize=(7, 5), num=4, clear=True, sharex=True)
+fig4, ax4 = plt.subplots(nrows=3, ncols=1, figsize=(7, 5), num=4, clear=True, sharex=True, constrained_layout = True)
 tags = ['all', 'pos', 'heading']
 dfs = [3, 2, 1]
 
@@ -246,7 +246,7 @@ for ax, tag, NEES, df in zip(ax4, tags, NEESes.T, dfs):
     insideCI = (CI_NEES[0] <= NEES) * (NEES <= CI_NEES[1])
     ax.set_title(f'NEES {tag}: {insideCI.mean()*100}% inside CI')
 
-    CI_ANEES = np.array(chi2.interval(alpha, df*N)) / N
+    CI_ANEES = np.array(chi2.interval(1-alpha, df*N)) / N
     print(f"CI ANEES {tag}: {CI_ANEES}")
     print(f"ANEES {tag}: {NEES.mean()}")
 
@@ -257,7 +257,7 @@ fig4.tight_layout()
 ylabels = ['m', 'deg']
 scalings = np.array([1, 180/np.pi])
 
-fig5, ax5 = plt.subplots(nrows=2, ncols=1, figsize=(7, 5), num=5, clear=True, sharex=True)
+fig5, ax5 = plt.subplots(nrows=2, ncols=1, figsize=(7, 5), num=5, clear=True, sharex=True, constrained_layout = True)
 
 pos_err = np.linalg.norm(pose_est[:N,:2] - poseGT[:N,:2], axis=1)
 heading_err = np.abs(utils.wrapToPi(pose_est[:N,2] - poseGT[:N,2]))

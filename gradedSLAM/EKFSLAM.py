@@ -182,6 +182,7 @@ class EKFSLAM:
         
         zpred_r = la.norm(delta_m, axis = 0)
         zpred_theta = np.arctan2(zpredcart[1], zpredcart[0]) # theta = atan(y/x)
+        
         """
         zpredcart = [Rot @ m_n for m_n in delta_m.T]
         zpred_r = [np.linalg.norm(m_n) for m_n in delta_m.T]
@@ -312,9 +313,7 @@ class EKFSLAM:
 
         assert len(lmnew) % 2 == 0, "SLAM.add_landmark: lmnew not even length"
         etaadded = np.concatenate((eta, lmnew))# TODO, append new landmarks to state vector
-        Padded = la.block_diag(P, Gx @ P[:3, :3] @ Gx.T + Rall) # TODO, block diagonal of P_new, see problem text in 1g) in graded assignment 3
-        #Padded = la.block_diag(P, Gx @ P[:3, :3] @ Gx.T + la.block_diag(*[Gz @ self.R @ Gz.T]*(len(z)//2)))
-        
+        Padded = la.block_diag(P, Gx @ P[:3, :3] @ Gx.T + Rall) # TODO, block diagonal of P_new, see problem text in 1g) in graded assignment 3        
         Padded[:n, n:] = P[:, :3] @ Gx.T # TODO, top right corner of P_new
         Padded[n:, :n] = Padded[:n, n:].T # TODO, transpose of above. Should yield the same as calcualion, but this enforces symmetry and should be cheaper
 
@@ -452,10 +451,10 @@ class EKFSLAM:
                 NIS = v @ la.solve(Sa, v) # TODO
 
                 # When tested, remove for speed
-                assert np.allclose(Pupd, Pupd.T), "EKFSLAM.update: Pupd not symmetric"
-                assert np.all(
-                    np.linalg.eigvals(Pupd) > 0
-                ), "EKFSLAM.update: Pupd not positive definite"
+                #assert np.allclose(Pupd, Pupd.T), "EKFSLAM.update: Pupd not symmetric"
+                #assert np.all(
+                #    np.linalg.eigvals(Pupd) > 0
+                #), "EKFSLAM.update: Pupd not positive definite"
 
         else:  # All measurements are new landmarks,
             a = np.full(z.shape[0], -1)
@@ -472,7 +471,8 @@ class EKFSLAM:
                 z_new_inds[::2] = is_new_lmk
                 z_new_inds[1::2] = is_new_lmk
                 z_new = z[z_new_inds]
-                etaupd, Pupd = self.add_landmarks(eta, P, z_new) # TODO, add new landmarks.
+                etaupd, Pupd = self.add_landmarks(etaupd, Pupd, z_new) # TODO, add new landmarks.
+                #etaupd, Pupd = self.add_landmarks(eta, P, z_new)
 
         assert np.allclose(Pupd, Pupd.T), "EKFSLAM.update: Pupd must be symmetric"
         assert np.all(np.linalg.eigvals(Pupd) >= 0), "EKFSLAM.update: Pupd must be PSD"
